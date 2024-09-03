@@ -183,6 +183,7 @@ async fn active_session(
                 let (action, payload) = frame.map_err(|e| session::custom_err!("read frame", e))?;
                 trace!(?action, frame_length = payload.len(), "Frame received");
 
+                println!("{:?}", action);
                 active_stage.process(&mut image, action, &payload)?
             }
             input_event = input_event_receiver.recv() => {
@@ -289,6 +290,7 @@ async fn active_session(
                     // Not applicable, because we use the software cursor rendering.
                 }
                 ActiveStageOutput::DeactivateAll(mut connection_activation) => {
+                    println!("ddddddd");
                     // Execute the Deactivation-Reactivation Sequence:
                     // https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpbcgr/dfc234ce-481a-4674-9a5d-2a7bafb14432
                     debug!("Received Server Deactivate All PDU, executing Deactivation-Reactivation Sequence");

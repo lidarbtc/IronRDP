@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use ironrdp_graphics::color_conversion::rdp_16bit_to_rgb;
 use ironrdp_graphics::image_processing::{ImageRegion, ImageRegionMut, PixelFormat};
@@ -26,7 +26,7 @@ pub struct DecodedImage {
     pointer_x: u16,
     pointer_y: u16,
 
-    pointer: Option<Rc<DecodedPointer>>,
+    pointer: Option<Arc<DecodedPointer>>,
     /// Image data, overridden by pointer. Used to restore image after pointer was hidden or moved
     pointer_backbuffer: Vec<u8>,
     /// Whether to show pointer or not
@@ -386,7 +386,7 @@ impl DecodedImage {
         }
     }
 
-    pub(crate) fn update_pointer(&mut self, pointer: Rc<DecodedPointer>) -> SessionResult<Option<InclusiveRectangle>> {
+    pub(crate) fn update_pointer(&mut self, pointer: Arc<DecodedPointer>) -> SessionResult<Option<InclusiveRectangle>> {
         self.show_pointer = true;
 
         // Remove old pointer from frame buffer

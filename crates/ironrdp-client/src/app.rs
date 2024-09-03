@@ -158,6 +158,7 @@ impl ApplicationHandler<RdpOutputEvent> for App {
             // }
             WindowEvent::KeyboardInput { event, .. } => {
                 if let Some(scancode) = event.physical_key.to_scancode() {
+                    println!("{}", scancode);
                     let scancode = ironrdp::input::Scancode::from_u16(u16::try_from(scancode).unwrap());
 
                     let operation = match event.state {

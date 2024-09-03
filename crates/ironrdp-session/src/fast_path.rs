@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use ironrdp_graphics::image_processing::PixelFormat;
 use ironrdp_graphics::pointer::{DecodedPointer, PointerBitmapTarget};
@@ -26,7 +26,7 @@ pub enum UpdateKind {
     PointerDefault,
     PointerHidden,
     PointerPosition { x: u16, y: u16 },
-    PointerBitmap(Rc<DecodedPointer>),
+    PointerBitmap(Arc<DecodedPointer>),
 }
 
 pub struct Processor {
@@ -218,17 +218,17 @@ impl Processor {
                     PointerUpdateData::Color(pointer) => {
                         let cache_index = pointer.cache_index;
 
-                        let decoded_pointer = Rc::new(
+                        let decoded_pointer = Arc::new(
                             DecodedPointer::decode_color_pointer_attribute(&pointer, bitmap_target)
                                 .expect("Failed to decode color pointer attribute"),
                         );
 
                         let _ = self
                             .pointer_cache
-                            .insert(usize::from(cache_index), Rc::clone(&decoded_pointer));
+                            .insert(usize::from(cache_index), Arc::clone(&decoded_pointer));
 
                         if !self.pointer_software_rendering {
-                            processor_updates.push(UpdateKind::PointerBitmap(Rc::clone(&decoded_pointer)));
+                            processor_updates.push(UpdateKind::PointerBitmap(Arc::clone(&decoded_pointer)));
                         } else if let Some(rect) = image.update_pointer(decoded_pointer)? {
                             processor_updates.push(UpdateKind::Region(rect));
                         }
@@ -242,7 +242,7 @@ impl Processor {
                             self.use_system_pointer = false;
                             // Send graphics update
                             if !self.pointer_software_rendering {
-                                processor_updates.push(UpdateKind::PointerBitmap(Rc::clone(&cached_pointer)));
+                                processor_updates.push(UpdateKind::PointerBitmap(Arc::clone(&cached_pointer)));
                             } else if let Some(rect) = image.update_pointer(cached_pointer)? {
                                 processor_updates.push(UpdateKind::Region(rect));
                             } else {
@@ -258,17 +258,17 @@ impl Processor {
                     PointerUpdateData::New(pointer) => {
                         let cache_index = pointer.color_pointer.cache_index;
 
-                        let decoded_pointer = Rc::new(
+                        let decoded_pointer = Arc::new(
                             DecodedPointer::decode_pointer_attribute(&pointer, bitmap_target)
                                 .expect("Failed to decode pointer attribute"),
                         );
 
                         let _ = self
                             .pointer_cache
-                            .insert(usize::from(cache_index), Rc::clone(&decoded_pointer));
+                            .insert(usize::from(cache_index), Arc::clone(&decoded_pointer));
 
                         if !self.pointer_software_rendering {
-                            processor_updates.push(UpdateKind::PointerBitmap(Rc::clone(&decoded_pointer)));
+                            processor_updates.push(UpdateKind::PointerBitmap(Arc::clone(&decoded_pointer)));
                         } else if let Some(rect) = image.update_pointer(decoded_pointer)? {
                             processor_updates.push(UpdateKind::Region(rect));
                         }
@@ -276,17 +276,17 @@ impl Processor {
                     PointerUpdateData::Large(pointer) => {
                         let cache_index = pointer.cache_index;
 
-                        let decoded_pointer: Rc<DecodedPointer> = Rc::new(
+                        let decoded_pointer: Arc<DecodedPointer> = Arc::new(
                             DecodedPointer::decode_large_pointer_attribute(&pointer, bitmap_target)
                                 .expect("Failed to decode large pointer attribute"),
                         );
 
                         let _ = self
                             .pointer_cache
-                            .insert(usize::from(cache_index), Rc::clone(&decoded_pointer));
+                            .insert(usize::from(cache_index), Arc::clone(&decoded_pointer));
 
                         if !self.pointer_software_rendering {
-                            processor_updates.push(UpdateKind::PointerBitmap(Rc::clone(&decoded_pointer)));
+                            processor_updates.push(UpdateKind::PointerBitmap(Arc::clone(&decoded_pointer)));
                         } else if let Some(rect) = image.update_pointer(decoded_pointer)? {
                             processor_updates.push(UpdateKind::Region(rect));
                         }
